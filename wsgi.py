@@ -18,8 +18,10 @@ import sys
 import os
 
 # ── Adjust these two lines to match your PythonAnywhere setup ──
-PROJECT_HOME = "/home/YourUsername/phishing-detector-v2"
-PYTHON_VERSION = "python3.10"  # match your PythonAnywhere python version
+import os
+
+PROJECT_HOME = os.path.dirname(os.path.abspath(__file__))
+os.chdir(PROJECT_HOME)
 # ───────────────────────────────────────────────────────────────
 
 if PROJECT_HOME not in sys.path:
