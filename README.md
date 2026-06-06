@@ -17,5 +17,3 @@ pip install -r requirements.txt
 python train_model.py
 python app.py
 
-## Live demo
-https://yourname.pythonanywhere.com
