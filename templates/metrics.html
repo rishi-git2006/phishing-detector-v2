@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Model Metrics — PhishGuard{% endblock %}
+
+{% block content %}
+<section class="hero compact">
+    <div class="hero-text">
+        <span class="badge">Transparency report</span>
+        <h1>Model Metrics</h1>
+        <p class="lead">
+            All numbers come from the held-out 20 % test set the model never saw during
+            training. Cross-validation scores confirm the model generalises well to unseen emails.
+        </p>
+    </div>
+</section>
+
+{% if not info %}
+<div class="alert alert-warning" role="alert">
+    No model trained yet. Run <code>python train_model.py</code>, then refresh.
+</div>
+{% else %}
+
+{# ── Summary hero ── #}
+<section class="card hero-summary">
+    <div class="summary-row">
+        <div>
+            <span class="muted small">Active model</span>
+            <h2>{{ info.best_model.replace('_', ' ').title() }}</h2>
+        </div>
+        <div class="summary-stats">
+            <div class="big-stat">
+                <span class="big-stat-value">{{ '%.1f'|format(info.best_metrics.f1_macro * 100) if info.best_metrics.f1_macro else '%.1f'|format(info.best_metrics.f1 * 100) }}%</span>
+                <span class="big-stat-label">Macro F1</span>
+            </div>
+            <div class="big-stat">
+                <span class="big-stat-value">{{ '%.1f'|format(info.best_metrics.accuracy * 100) }}%</span>
+                <span class="big-stat-label">Accuracy</span>
+            </div>
+            <div class="big-stat">
+                <span class="big-stat-value">{{ '%.1f'|format(info.best_metrics.precision * 100) }}%</span>
+                <span class="big-stat-label">Precision</span>
+            </div>
+            <div class="big-stat">
+                <span class="big-stat-value">{{ '%.1f'|format(info.best_metrics.recall * 100) }}%</span>
+                <span class="big-stat-label">Recall</span>
+            </div>
+        </div>
+    </div>
+    <p class="muted small">
+        Training set: <strong>{{ info.n_train }}</strong> emails &nbsp;&middot;&nbsp;
+        Test set: <strong>{{ info.n_test }}</strong> emails
+        {% if info.class_distribution %}
+        &nbsp;&middot;&nbsp; Phishing: <strong>{{ info.class_distribution.get('1', info.class_distribution.get(1, '?')) }}</strong>
+        &nbsp;&middot;&nbsp; Legitimate: <strong>{{ info.class_distribution.get('0', info.class_distribution.get(0, '?')) }}</strong>
+        {% endif %}
+    </p>
+</section>
+
+{# ── Cross-validation scores ── #}
+{% if info.cv_scores %}
+<section class="card">
+    <div class="card-head">
+        <h2>5-Fold Cross-Validation F1 Scores</h2>
+        <span class="pill">Overfitting check</span>
+    </div>
+    <p class="muted small" style="margin-bottom:18px">
+        CV scores are computed on the full dataset. A small gap between CV and test F1 indicates the model generalises well.
+    </p>
+    <div class="cv-grid">
+        {% for model_key, cv in info.cv_scores.items() %}
+        <div class="cv-card">
+            <div class="cv-name">{{ model_key.replace('_', ' ').title() }}</div>
+            <div class="cv-score">{{ '%.4f'|format(cv.mean) }}</div>
+            <div class="cv-sub">mean F1 ± {{ '%.4f'|format(cv.std) }}</div>
+            <div class="cv-folds">
+                {% for fold_score in cv.folds %}
+                <div class="cv-fold-bar" title="Fold: {{ '%.3f'|format(fold_score) }}">
+                    <div class="cv-fold-fill" style="height: {{ (fold_score * 100)|int }}%"></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{# ── Per-model cards ── #}
+<div class="result-grid">
+    {% for m in info.all_metrics %}
+    <section class="card">
+        <div class="card-head">
+            <h2>{{ m.model }}</h2>
+            {% if m.model == info.best_metrics.model %}
+            <span class="pill pill-good">✓ Active</span>
+            {% endif %}
+        </div>
+
+        <div class="metric-row">
+            <div class="metric">
+                <span class="metric-value">{{ '%.3f'|format(m.accuracy) }}</span>
+                <span class="metric-label">Accuracy</span>
+            </div>
+            <div class="metric">
+                <span class="metric-value">{{ '%.3f'|format(m.precision) }}</span>
+                <span class="metric-label">Precision</span>
+            </div>
+            <div class="metric">
+                <span class="metric-value">{{ '%.3f'|format(m.recall) }}</span>
+                <span class="metric-label">Recall</span>
+            </div>
+            <div class="metric">
+                <span class="metric-value">{{ '%.3f'|format(m.f1) }}</span>
+                <span class="metric-label">F1</span>
+            </div>
+        </div>
+
+        {% if m.phishing_precision is defined %}
+        <div class="per-class-grid">
+            <div class="per-class">
+                <span class="pc-label">Phishing detection</span>
+                <div class="pc-row">
+                    <span class="pc-stat">P: {{ '%.3f'|format(m.phishing_precision) }}</span>
+                    <span class="pc-stat">R: {{ '%.3f'|format(m.phishing_recall) }}</span>
+                </div>
+            </div>
+            <div class="per-class">
+                <span class="pc-label">Legitimate classification</span>
+                <div class="pc-row">
+                    <span class="pc-stat">P: {{ '%.3f'|format(m.legit_precision) }}</span>
+                    <span class="pc-stat">R: {{ '%.3f'|format(m.legit_recall) }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <h3 class="subhead">Confusion matrix</h3>
+        <table class="confusion" role="table" aria-label="Confusion matrix">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Predicted Legitimate</th>
+                    <th>Predicted Phishing</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Actual Legitimate</th>
+                    <td class="cm-good">
+                        {{ m.confusion_matrix[0][0] }}
+                        <span class="cm-tag">true negatives</span>
+                    </td>
+                    <td class="cm-bad">
+                        {{ m.confusion_matrix[0][1] }}
+                        <span class="cm-tag">false positives</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Actual Phishing</th>
+                    <td class="cm-bad">
+                        {{ m.confusion_matrix[1][0] }}
+                        <span class="cm-tag">false negatives</span>
+                    </td>
+                    <td class="cm-good">
+                        {{ m.confusion_matrix[1][1] }}
+                        <span class="cm-tag">true positives</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="subhead">Classification report</h3>
+        <pre class="report">{{ m.classification_report }}</pre>
+    </section>
+    {% endfor %}
+</div>
+
+{# Feature list #}
+<section class="card">
+    <div class="card-head">
+        <h2>Feature engineering</h2>
+        <span class="pill">{{ info.feature_names|length }} features</span>
+    </div>
+    <p class="muted" style="margin-bottom:16px">
+        These hand-crafted features are concatenated with the 8,000-feature TF-IDF vector
+        and fed into the combined-feature models.
+    </p>
+    <div class="feature-tags">
+        {% for f in info.feature_names %}
+        <span class="tag tag-neutral">{{ f }}</span>
+        {% endfor %}
+    </div>
+</section>
+
+{% endif %}
+{% endblock %}

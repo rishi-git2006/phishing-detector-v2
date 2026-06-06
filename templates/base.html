@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PhishGuard — ML-powered phishing email detector using TF-IDF and Logistic Regression">
+    <title>{% block title %}PhishGuard — Phishing Email Detector{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="{{ url_for('index') }}" class="brand">
+                <span class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </span>
+                <div class="brand-text">
+                    <span class="brand-name">PhishGuard</span>
+                    <span class="brand-tag">ML-powered email threat detector</span>
+                </div>
+            </a>
+            <nav class="site-nav">
+                <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Analyse</a>
+                <a href="{{ url_for('metrics') }}" class="nav-link {% if request.endpoint == 'metrics' %}active{% endif %}">Metrics</a>
+                <a href="{{ url_for('about') }}" class="nav-link {% if request.endpoint == 'about' %}active{% endif %}">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <span class="footer-brand">PhishGuard v2</span>
+            <span class="footer-sep">&middot;</span>
+            <span>TF-IDF + Logistic Regression / Naive Bayes / Random Forest</span>
+            <span class="footer-sep">&middot;</span>
+            <span>18 linguistic + 9 URL features</span>
+        </div>
+    </footer>
+</body>
+</html>

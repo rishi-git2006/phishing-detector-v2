@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Analyse an Email — PhishGuard{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-text">
+        <span class="badge">ML + Rule-based hybrid · v2</span>
+        <h1>Is this email <span class="accent">phishing</span> or legitimate?</h1>
+        <p class="lead">
+            Paste any email below. PhishGuard analyses it with a trained TF-IDF
+            classifier, scans every URL for typosquats and shorteners, and explains
+            exactly which signals drove the verdict.
+        </p>
+    </div>
+    <div class="hero-stats">
+        <div class="stat">
+            <span class="stat-num">18</span>
+            <span class="stat-label">linguistic signals</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num">9</span>
+            <span class="stat-label">URL signals</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num">8k</span>
+            <span class="stat-label">TF-IDF features</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num">3</span>
+            <span class="stat-label">models trained</span>
+        </div>
+    </div>
+</section>
+
+{% if error %}
+<div class="alert alert-error" role="alert">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>{{ error }}</span>
+</div>
+{% endif %}
+
+{% if not model_ready %}
+<div class="alert alert-warning" role="alert">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span><strong>Model not loaded.</strong> Open a terminal and run <code>python train_model.py</code>, then restart the Flask app.</span>
+</div>
+{% endif %}
+
+<section class="card analyzer-card">
+    <form method="POST" action="{{ url_for('predict') }}" class="analyzer-form" id="analyzeForm">
+        <div class="form-head">
+            <label for="email_text">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Email body to analyse
+            </label>
+            {% if prefill_title %}
+            <span class="prefill-tag">Sample loaded: {{ prefill_title }}</span>
+            {% endif %}
+        </div>
+        <textarea
+            id="email_text"
+            name="email_text"
+            placeholder="Paste the full email body here — including headers, subject line, links, and any forwarded content."
+            rows="13"
+            maxlength="50000"
+            required
+            spellcheck="false"
+            autocomplete="off"
+        >{{ prefill_body }}</textarea>
+        <div class="char-counter">
+            <span id="charCount">0</span> / 50,000 characters
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="submitBtn" {% if not model_ready %}disabled{% endif %}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Analyse email
+            </button>
+            <button type="button" class="btn btn-ghost" id="clearBtn">Clear</button>
+            <span class="hint">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Analysis runs locally — nothing is stored or sent anywhere.
+            </span>
+        </div>
+    </form>
+</section>
+
+<section class="samples">
+    <h2>Try a sample email</h2>
+    <p class="muted">Click any sample to load it into the analyser above.</p>
+    <div class="samples-grid">
+        {% for s in samples %}
+        <a href="{{ url_for('index', sample=loop.index0) }}#email_text" class="sample-card sample-{{ s.category }}">
+            <div class="sample-header">
+                <span class="sample-num">{{ loop.index }}</span>
+                <span class="sample-badge badge-{{ s.category }}">{{ s.category }}</span>
+            </div>
+            <span class="sample-title">{{ s.title }}</span>
+            <span class="sample-snippet">{{ s.body[:110] }}{% if s.body|length > 110 %}…{% endif %}</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="how-it-works">
+    <h2>How it works</h2>
+    <div class="steps-grid">
+        <div class="step">
+            <span class="step-num">1</span>
+            <h3>Text vectorisation</h3>
+            <p>A TF-IDF vectoriser converts the email body into 8,000 weighted 1–3-word n-gram features, capturing language patterns unique to phishing.</p>
+        </div>
+        <div class="step">
+            <span class="step-num">2</span>
+            <h3>Linguistic signals</h3>
+            <p>18 hand-crafted features count urgency phrases, ALL CAPS, credential requests, generic greetings, threats, money baits, and spoofing phrases.</p>
+        </div>
+        <div class="step">
+            <span class="step-num">3</span>
+            <h3>URL analysis</h3>
+            <p>Every link is scored across 9 dimensions: IP-based host, URL shorteners, abusive TLDs (.tk/.xyz), brand typosquats, deceptive paths, and more.</p>
+        </div>
+        <div class="step">
+            <span class="step-num">4</span>
+            <h3>Ensemble verdict</h3>
+            <p>Naive Bayes, Logistic Regression, and Random Forest are all trained. The best model by macro F1 is selected and served.</p>
+        </div>
+    </div>
+</section>
+
+<script>
+    const textarea = document.getElementById('email_text');
+    const counter  = document.getElementById('charCount');
+    const clearBtn = document.getElementById('clearBtn');
+    const form     = document.getElementById('analyzeForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function updateCount() {
+        const len = textarea.value.length;
+        counter.textContent = len.toLocaleString();
+        counter.style.color = len > 45000 ? 'var(--warning)' : 'var(--text-faint)';
+    }
+    textarea.addEventListener('input', updateCount);
+    updateCount();
+
+    clearBtn.addEventListener('click', () => {
+        textarea.value = '';
+        updateCount();
+        textarea.focus();
+    });
+
+    form.addEventListener('submit', () => {
+        submitBtn.textContent = 'Analysing…';
+        submitBtn.disabled = true;
+    });
+
+    // Auto-scroll to textarea when a sample is loaded
+    if (window.location.hash === '#email_text') {
+        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        textarea.focus();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}About — PhishGuard{% endblock %}
+
+{% block content %}
+<section class="hero compact">
+    <div class="hero-text">
+        <span class="badge">Project documentation</span>
+        <h1>About PhishGuard</h1>
+        <p class="lead">
+            A machine-learning-powered phishing email detection system built with Python, Flask,
+            and scikit-learn. Developed as a cybersecurity portfolio project demonstrating applied
+            NLP and threat detection techniques.
+        </p>
+    </div>
+</section>
+
+<div class="about-grid">
+
+    <section class="card">
+        <div class="card-head"><h2>Tech Stack</h2></div>
+        <ul class="about-list">
+            <li><span class="about-badge">Python 3.10+</span> Core language</li>
+            <li><span class="about-badge">Flask</span> Web framework &amp; routing</li>
+            <li><span class="about-badge">scikit-learn</span> ML models (LR, NB, RF) and TF-IDF</li>
+            <li><span class="about-badge">pandas / numpy</span> Data handling and feature engineering</li>
+            <li><span class="about-badge">scipy</span> Sparse matrix operations for combined features</li>
+            <li><span class="about-badge">joblib</span> Model serialisation</li>
+            <li><span class="about-badge">Jinja2</span> HTML templating (auto-escaping enabled)</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <div class="card-head"><h2>ML Pipeline</h2></div>
+        <ol class="about-steps">
+            <li>
+                <strong>Dataset</strong> — 200+ labelled emails (phishing + legitimate) covering
+                diverse attack types: credential harvesting, prize scams, CEO fraud, delivery scams, and more.
+            </li>
+            <li>
+                <strong>TF-IDF vectorisation</strong> — 8,000-feature 1–3-gram representation with
+                sublinear TF scaling and English stop-word removal.
+            </li>
+            <li>
+                <strong>Feature engineering</strong> — 18 linguistic signals (urgency, credentials,
+                threats, spoofing) + 9 URL signals (typosquats, shorteners, suspicious TLDs).
+            </li>
+            <li>
+                <strong>Training</strong> — Three candidate models trained: Multinomial Naive Bayes,
+                Logistic Regression, Random Forest. Best selected by macro F1.
+            </li>
+            <li>
+                <strong>Validation</strong> — Stratified 80/20 split + 5-fold cross-validation to
+                detect overfitting and confirm generalisation.
+            </li>
+        </ol>
+    </section>
+
+    <section class="card">
+        <div class="card-head"><h2>Cybersecurity Features</h2></div>
+        <ul class="about-list">
+            <li>🔗 <strong>URL typosquat detection</strong> — Levenshtein-distance check against 50+ popular brands</li>
+            <li>🌐 <strong>TLD abuse detection</strong> — Flags 40+ high-abuse TLDs (.tk, .xyz, .gq …)</li>
+            <li>🔤 <strong>Character substitution detection</strong> — Catches paypa1, g00gle-style tricks</li>
+            <li>👤 <strong>Sender spoofing detection</strong> — Identifies false authority claims ("This is PayPal")</li>
+            <li>⚠️ <strong>Urgency &amp; threat analysis</strong> — 60+ urgency and threat phrases</li>
+            <li>💰 <strong>Social engineering bait</strong> — Prize/money/inheritance scam patterns</li>
+            <li>🛡️ <strong>Input validation</strong> — Length limits, null-byte stripping, Jinja2 auto-escaping</li>
+            <li>📊 <strong>Explainability</strong> — Every verdict is backed by specific, human-readable flags</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <div class="card-head"><h2>Limitations &amp; Future Work</h2></div>
+        <ul class="about-list">
+            <li>Dataset is hand-crafted (~200 emails). Integrating real-world corpora (Enron, SpamAssassin) would significantly improve accuracy.</li>
+            <li>Model does not analyse email headers (From/Reply-To spoofing, DKIM/SPF status). Header analysis is a high-value future addition.</li>
+            <li>No live URL checking — URLs are analysed structurally, not fetched. WHOIS age and reputation lookups would reduce false negatives.</li>
+            <li>Multilingual phishing emails are not handled — model is trained on English text only.</li>
+            <li>A feedback loop (user-reported misclassifications feeding back into training) would enable continuous improvement in production.</li>
+        </ul>
+    </section>
+
+</div>
+{% endblock %}
