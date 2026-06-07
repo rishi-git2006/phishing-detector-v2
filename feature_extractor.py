@@ -166,6 +166,10 @@ _LEGIT_ACRONYMS = {
     "URL", "PIN", "SSN", "CEO", "CFO", "CTO", "HR", "IT", "ID",
     "PDF", "FAQ", "NDA", "API", "UI", "UX", "PC", "TV", "OK",
     "USA", "UK", "EU", "UN", "FBI", "IRS", "ATM",
+    # Indian banking / transaction codes
+    "SBI", "HDFC", "ICICI", "NEFT", "RTGS", "IMPS", "UPI", "OTP",
+    "EXAM", "FEE", "TXN", "UTR", "EPFO", "UAN", "LIC", "EMI",
+    "PBRVITS", "DUP", "SB", "POS", "KYC", "IFSC", "GSTIN",
 }
 
 
