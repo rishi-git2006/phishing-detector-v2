@@ -1,6 +1,6 @@
 {
-  "best_model": "naive_bayes",
-  "uses_combined_features": false,
+  "best_model": "random_forest",
+  "uses_combined_features": true,
   "feature_names": [
     "char_length",
     "word_count",
@@ -30,50 +30,96 @@
     "max_url_score",
     "any_suspicious_url"
   ],
-  "n_train": 306,
-  "n_test": 77,
+  "n_train": 536,
+  "n_test": 134,
   "class_distribution": {
-    "0": 228,
-    "1": 155
+    "0": 419,
+    "1": 251
   },
   "cv_scores": {
     "naive_bayes": {
-      "mean": 0.9656,
-      "std": 0.0369,
+      "mean": 0.9686,
+      "std": 0.0151,
       "folds": [
-        0.9836065573770492,
-        1.0,
-        0.9354838709677419,
-        0.9090909090909091,
-        1.0
+        0.9523809523809523,
+        0.9795918367346939,
+        0.9514563106796117,
+        0.9696969696969697,
+        0.9900990099009901
       ]
     },
     "logistic_regression": {
-      "mean": 0.931,
-      "std": 0.03,
+      "mean": 0.9521,
+      "std": 0.0146,
       "folds": [
-        0.9310344827586207,
-        0.9310344827586207,
-        0.8771929824561403,
-        0.9491525423728814,
-        0.9666666666666667
+        0.9591836734693877,
+        0.9263157894736842,
+        0.9583333333333334,
+        0.9473684210526315,
+        0.9690721649484536
       ]
     },
     "random_forest": {
-      "mean": 0.9307,
-      "std": 0.0199,
+      "mean": 0.9498,
+      "std": 0.0129,
       "folds": [
-        0.9310344827586207,
-        0.9122807017543859,
-        0.9310344827586207,
-        0.9122807017543859,
-        0.9666666666666667
+        0.9484536082474226,
+        0.9591836734693877,
+        0.9361702127659575,
+        0.9361702127659575,
+        0.9690721649484536
       ]
     }
   },
   "all_metrics": [
     {
       "model": "Multinomial Naive Bayes (TF-IDF only)",
+      "accuracy": 0.9851,
+      "precision": 1.0,
+      "recall": 0.96,
+      "f1": 0.9796,
+      "f1_macro": 0.9839,
+      "phishing_precision": 1.0,
+      "phishing_recall": 0.96,
+      "legit_precision": 0.9767,
+      "legit_recall": 1.0,
+      "confusion_matrix": [
+        [
+          84,
+          0
+        ],
+        [
+          2,
+          48
+        ]
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  legitimate      0.977     1.000     0.988        84\n    phishing      1.000     0.960     0.980        50\n\n    accuracy                          0.985       134\n   macro avg      0.988     0.980     0.984       134\nweighted avg      0.985     0.985     0.985       134\n"
+    },
+    {
+      "model": "Logistic Regression (TF-IDF + custom features)",
+      "accuracy": 0.9851,
+      "precision": 1.0,
+      "recall": 0.96,
+      "f1": 0.9796,
+      "f1_macro": 0.9839,
+      "phishing_precision": 1.0,
+      "phishing_recall": 0.96,
+      "legit_precision": 0.9767,
+      "legit_recall": 1.0,
+      "confusion_matrix": [
+        [
+          84,
+          0
+        ],
+        [
+          2,
+          48
+        ]
+      ],
+      "classification_report": "              precision    recall  f1-score   support\n\n  legitimate      0.977     1.000     0.988        84\n    phishing      1.000     0.960     0.980        50\n\n    accuracy                          0.985       134\n   macro avg      0.988     0.980     0.984       134\nweighted avg      0.985     0.985     0.985       134\n"
+    },
+    {
+      "model": "Random Forest (TF-IDF + custom features)",
       "accuracy": 1.0,
       "precision": 1.0,
       "recall": 1.0,
@@ -85,65 +131,19 @@
       "legit_recall": 1.0,
       "confusion_matrix": [
         [
-          46,
+          84,
           0
         ],
         [
           0,
-          31
+          50
         ]
       ],
-      "classification_report": "              precision    recall  f1-score   support\n\n  legitimate      1.000     1.000     1.000        46\n    phishing      1.000     1.000     1.000        31\n\n    accuracy                          1.000        77\n   macro avg      1.000     1.000     1.000        77\nweighted avg      1.000     1.000     1.000        77\n"
-    },
-    {
-      "model": "Logistic Regression (TF-IDF + custom features)",
-      "accuracy": 0.961,
-      "precision": 1.0,
-      "recall": 0.9032,
-      "f1": 0.9492,
-      "f1_macro": 0.9588,
-      "phishing_precision": 1.0,
-      "phishing_recall": 0.9032,
-      "legit_precision": 0.9388,
-      "legit_recall": 1.0,
-      "confusion_matrix": [
-        [
-          46,
-          0
-        ],
-        [
-          3,
-          28
-        ]
-      ],
-      "classification_report": "              precision    recall  f1-score   support\n\n  legitimate      0.939     1.000     0.968        46\n    phishing      1.000     0.903     0.949        31\n\n    accuracy                          0.961        77\n   macro avg      0.969     0.952     0.959        77\nweighted avg      0.963     0.961     0.961        77\n"
-    },
-    {
-      "model": "Random Forest (TF-IDF + custom features)",
-      "accuracy": 0.961,
-      "precision": 1.0,
-      "recall": 0.9032,
-      "f1": 0.9492,
-      "f1_macro": 0.9588,
-      "phishing_precision": 1.0,
-      "phishing_recall": 0.9032,
-      "legit_precision": 0.9388,
-      "legit_recall": 1.0,
-      "confusion_matrix": [
-        [
-          46,
-          0
-        ],
-        [
-          3,
-          28
-        ]
-      ],
-      "classification_report": "              precision    recall  f1-score   support\n\n  legitimate      0.939     1.000     0.968        46\n    phishing      1.000     0.903     0.949        31\n\n    accuracy                          0.961        77\n   macro avg      0.969     0.952     0.959        77\nweighted avg      0.963     0.961     0.961        77\n"
+      "classification_report": "              precision    recall  f1-score   support\n\n  legitimate      1.000     1.000     1.000        84\n    phishing      1.000     1.000     1.000        50\n\n    accuracy                          1.000       134\n   macro avg      1.000     1.000     1.000       134\nweighted avg      1.000     1.000     1.000       134\n"
     }
   ],
   "best_metrics": {
-    "model": "Multinomial Naive Bayes (TF-IDF only)",
+    "model": "Random Forest (TF-IDF + custom features)",
     "accuracy": 1.0,
     "precision": 1.0,
     "recall": 1.0,
@@ -155,14 +155,14 @@
     "legit_recall": 1.0,
     "confusion_matrix": [
       [
-        46,
+        84,
         0
       ],
       [
         0,
-        31
+        50
       ]
     ],
-    "classification_report": "              precision    recall  f1-score   support\n\n  legitimate      1.000     1.000     1.000        46\n    phishing      1.000     1.000     1.000        31\n\n    accuracy                          1.000        77\n   macro avg      1.000     1.000     1.000        77\nweighted avg      1.000     1.000     1.000        77\n"
+    "classification_report": "              precision    recall  f1-score   support\n\n  legitimate      1.000     1.000     1.000        84\n    phishing      1.000     1.000     1.000        50\n\n    accuracy                          1.000       134\n   macro avg      1.000     1.000     1.000       134\nweighted avg      1.000     1.000     1.000       134\n"
   }
 }
